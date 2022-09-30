@@ -6,20 +6,20 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import static org.junit.platform.engine.TestDescriptor.Type.TEST;
 
-public class ExpressionDescriptor extends AbstractTestDescriptor {
+public class ConstantExpressionDescriptor extends AbstractTestDescriptor {
 
-  private final String expression;
+  private final String constExpression;
 
   private final String expected;
 
-  public ExpressionDescriptor(TestDescriptor parent, String expression) {
-    this(parent, expression, "");
+  public ConstantExpressionDescriptor(TestDescriptor parent, String constExpression) {
+    this(parent, constExpression, "");
   }
 
-  public ExpressionDescriptor(TestDescriptor parent, String expression, String expected) {
-    super(uniqueIdFor(parent, expression, expected), displayNameFor(expression, expected));
+  public ConstantExpressionDescriptor(TestDescriptor parent, String constExpression, String expected) {
+    super(uniqueIdFor(parent, constExpression, expected), displayNameFor(constExpression, expected));
 
-    this.expression = expression;
+    this.constExpression = constExpression;
     this.expected = expected;
   }
 
@@ -28,8 +28,8 @@ public class ExpressionDescriptor extends AbstractTestDescriptor {
     return TEST;
   }
 
-  public String getExpression() {
-    return expression;
+  public String getConstExpression() {
+    return constExpression;
   }
 
   public String getExpected() {
@@ -37,7 +37,7 @@ public class ExpressionDescriptor extends AbstractTestDescriptor {
   }
 
   private static UniqueId uniqueIdFor(TestDescriptor parent, String expression, String expected) {
-    var uniqueId = parent.getUniqueId().append("expression", expression);
+    var uniqueId = parent.getUniqueId().append("const-expression", expression);
 
     if (!expected.isBlank()) {
       uniqueId = uniqueId.append("expected", expected);

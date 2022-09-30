@@ -19,13 +19,15 @@ public class ExpressionTestEngineTest {
             .debug();
 
     // assert
-    events.assertEventsMatchExactly(
+    events.assertEventsMatchLooselyInOrder(
             event(engine(), started()),
             event(container(ExpressionsTest.class), started()),
-            event(test("expression:6 * 7"), started()),
-            event(test("expression:6 * 7"), finishedSuccessfully()),
-            event(test("expression:2 * 3 * 7"), started()),
-            event(test("expression:2 * 3 * 7"), finishedWithFailure()),
+            event(test("const-expression:6 * 7"), started()),
+            event(test("const-expression:6 * 7"), finishedSuccessfully()),
+            event(test("const-expression:2 * 3 * 7"), started()),
+            event(test("const-expression:2 * 3 * 7"), finishedSuccessfully()),
+            event(test("var-expression:x * x"), started()),
+            event(test("var-expression:x * x"), finishedSuccessfully()),
             event(container(ExpressionsTest.class), finishedSuccessfully()),
             event(engine(), finishedSuccessfully())
     );

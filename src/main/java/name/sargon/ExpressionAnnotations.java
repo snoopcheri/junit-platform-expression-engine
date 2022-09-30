@@ -2,10 +2,10 @@ package name.sargon;
 
 import org.junit.platform.commons.annotation.Testable;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -24,11 +24,19 @@ public class ExpressionAnnotations {
   @interface Expressions {
   }
 
-  @Target(ElementType.FIELD)
+  @Target(FIELD)
   @Retention(RUNTIME)
   @Testable
-  @interface Expression {
+  @interface ConstantExpression {
     String expected() default "";
+  }
+
+  @Target(FIELD)
+  @Retention(RUNTIME)
+  @Testable
+  @interface VariableExpression {
+    String from() default "0";
+    String to() default "0";
   }
 
 }

@@ -1,13 +1,16 @@
 package name.sargon;
 
 import name.sargon.descriptors.ClassBasedExpressionDescriptor;
-import name.sargon.descriptors.ExpressionDescriptor;
+import name.sargon.descriptors.ConstantExpressionDescriptor;
+import name.sargon.descriptors.VariableExpressionDescriptor;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.opentest4j.AssertionFailedError;
 
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static org.junit.platform.engine.TestExecutionResult.failed;
 import static org.junit.platform.engine.TestExecutionResult.successful;
 
@@ -39,8 +42,13 @@ public class ExpressionTestExecutor {
       executionListener.executionStarted(classBasedDescriptor);
 
       classBasedDescriptor.getChildren().stream()
-              .filter(descriptor -> descriptor instanceof ExpressionDescriptor)
-              .map(ExpressionDescriptor.class::cast)
+              .filter(descriptor -> descriptor instanceof ConstantExpressionDescriptor)
+              .map(ConstantExpressionDescriptor.class::cast)
+              .forEachOrdered(this::execute);
+
+      classBasedDescriptor.getChildren().stream()
+              .filter(descriptor -> descriptor instanceof VariableExpressionDescriptor)
+              .map(VariableExpressionDescriptor.class::cast)
               .forEachOrdered(this::execute);
 
       executionListener.executionFinished(classBasedDescriptor, successful());
@@ -49,11 +57,11 @@ public class ExpressionTestExecutor {
     }
   }
 
-  private void execute(ExpressionDescriptor descriptor) {
+  private void execute(ConstantExpressionDescriptor descriptor) {
     try {
       executionListener.executionStarted(descriptor);
 
-      var expression = descriptor.getExpression();
+      var expression = descriptor.getConstExpression();
       var expected = descriptor.getExpected();
       var actual = (int) new ExpressionBuilder(expression).build().evaluate();
 
@@ -66,11 +74,34 @@ public class ExpressionTestExecutor {
     }
   }
 
+  private void execute(VariableExpressionDescriptor descriptor) {
+    try {
+      executionListener.executionStarted(descriptor);
+
+      var varExpression = descriptor.getVarExpression();
+      var from = parseInt(descriptor.getFrom());
+      var to = parseInt(descriptor.getTo());
+
+      for (int val = from; val <= to; val++) {
+        var constExpression = varExpression.replace("x", valueOf(val));
+        var child = new ConstantExpressionDescriptor(descriptor, constExpression);
+        descriptor.addChild(child);
+        executionListener.dynamicTestRegistered(child);
+
+        execute(child);
+      }
+
+      executionListener.executionFinished(descriptor, successful());
+    } catch (Throwable failure) {
+      executionListener.executionFinished(descriptor, failed(failure));
+    }
+  }
+
   private static void showAndVerify(String expression, String expected, int actual) {
     if (expected.isBlank()) {
       showResult(expression, actual, "");
     } else {
-      var value = Integer.parseInt(expected);
+      var value = parseInt(expected);
       if (value == actual) {
         showResult(expression, actual, " ✓");
       } else {

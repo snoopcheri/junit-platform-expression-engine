@@ -1,10 +1,12 @@
 package name.sargon;
 
-import name.sargon.ExpressionAnnotations.Expression;
+import name.sargon.ExpressionAnnotations.ConstantExpression;
 import name.sargon.ExpressionAnnotations.Expressions;
 import name.sargon.ExpressionAnnotations.ExpressionsResource;
+import name.sargon.ExpressionAnnotations.VariableExpression;
 import name.sargon.descriptors.ClassBasedExpressionDescriptor;
-import name.sargon.descriptors.ExpressionDescriptor;
+import name.sargon.descriptors.ConstantExpressionDescriptor;
+import name.sargon.descriptors.VariableExpressionDescriptor;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.TestDescriptor;
 
@@ -62,25 +64,43 @@ class ExpressionTestDiscoverer {
 
   static class ExpressionsAnnotatedClassGenerator {
     static void generateForExpressionAnnotation(Class<?> clazz, TestDescriptor parent) {
-      var fields = ReflectionSupport.findFields(
+      var constantExpressionFields = ReflectionSupport.findFields(
               clazz,
-              field -> field.isAnnotationPresent(Expression.class) && isStatic(field.getModifiers()) && field.getType() == String.class,
+              field -> field.isAnnotationPresent(ConstantExpression.class) && isStatic(field.getModifiers()) && field.getType() == String.class,
               TOP_DOWN
       );
 
-      fields.forEach(field -> generate(clazz, field, parent));
+      constantExpressionFields.forEach(field -> addConstantExpression(clazz, field, parent));
+
+      var variableExpressionFields = ReflectionSupport.findFields(
+              clazz,
+              field -> field.isAnnotationPresent(VariableExpression.class) && isStatic(field.getModifiers()) && field.getType() == String.class,
+              TOP_DOWN
+      );
+
+      variableExpressionFields.forEach(field -> addVariableExpression(clazz, field, parent));
     }
 
-    private static void generate(Class<?> clazz, Field field, TestDescriptor parent) {
+    private static void addConstantExpression(Class<?> clazz, Field field, TestDescriptor parent) {
       var expression = getStringValueOf(field, clazz);
-      var annotation = field.getAnnotation(Expression.class);
+      var annotation = field.getAnnotation(ConstantExpression.class);
       var expected = annotation.expected();
-      var descriptor = new ExpressionDescriptor(parent, expression, expected);
+      var descriptor = new ConstantExpressionDescriptor(parent, expression, expected);
 
       parent.addChild(descriptor);
     }
 
-    private static String getStringValueOf(Field field, Class<?> clazz) {
+    private static void addVariableExpression(Class<?> clazz, Field field, TestDescriptor parent) {
+      var expression = getStringValueOf(field, clazz);
+      var annotation = field.getAnnotation(VariableExpression.class);
+      var from = annotation.from();
+      var to = annotation.to();
+      var descriptor = new VariableExpressionDescriptor(parent, expression, from, to);
+
+      parent.addChild(descriptor);
+    }
+
+      private static String getStringValueOf(Field field, Class<?> clazz) {
       try {
         return field.get(clazz).toString();
       } catch (IllegalAccessException e) {
@@ -98,7 +118,7 @@ class ExpressionTestDiscoverer {
         }
 
         new BufferedReader(new InputStreamReader(is)).lines().forEach(expression -> {
-          var descriptor = new ExpressionDescriptor(parent, expression);
+          var descriptor = new ConstantExpressionDescriptor(parent, expression);
           parent.addChild(descriptor);
         });
       } catch (IOException exc) {
