@@ -1,9 +1,9 @@
 package name.sargon;
 
+import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-import static name.sargon.ExpressionTestEngine.EXPRESSION_TEST_ENGINE_ID;
 import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER_AND_TEST;
 
 class ExpressionTestDescriptor extends AbstractTestDescriptor {
@@ -12,8 +12,12 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
 
   private final String expected;
 
-  ExpressionTestDescriptor(String expression, String expected) {
-    super(uniqueIdFor(expression, expected), displayNameFor(expression, expected));
+  ExpressionTestDescriptor(TestDescriptor parent, String expression) {
+    this(parent, expression, "");
+  }
+
+  ExpressionTestDescriptor(TestDescriptor parent, String expression, String expected) {
+    super(uniqueIdFor(parent, expression, expected), displayNameFor(expression, expected));
 
     this.expression = expression;
     this.expected = expected;
@@ -32,9 +36,8 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
     return expected;
   }
 
-  private static UniqueId uniqueIdFor(String expression, String expected) {
-    var uniqueId = UniqueId.forEngine(EXPRESSION_TEST_ENGINE_ID)
-            .append("expression", expression);
+  private static UniqueId uniqueIdFor(TestDescriptor parent, String expression, String expected) {
+    var uniqueId = parent.getUniqueId().append("expression", expression);
 
     if (!expected.isBlank()) {
       uniqueId = uniqueId.append("expected", expected);

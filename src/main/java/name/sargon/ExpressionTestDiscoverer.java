@@ -14,32 +14,42 @@ import java.net.URI;
 
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isStatic;
-import static name.sargon.ExpressionTestDescriptorFactory.ExpressionResourceAnnotatedClassGenerator.generateForExpressionResourceAnnotation;
-import static name.sargon.ExpressionTestDescriptorFactory.ExpressionsAnnotatedClassGenerator.generateForExpressionAnnotation;
+import static name.sargon.ExpressionTestDiscoverer.ExpressionResourceAnnotatedClassGenerator.generateForExpressionResourceAnnotation;
+import static name.sargon.ExpressionTestDiscoverer.ExpressionsAnnotatedClassGenerator.generateForExpressionAnnotation;
 import static org.junit.platform.commons.support.HierarchyTraversalMode.TOP_DOWN;
 
-class ExpressionTestDescriptorFactory {
+class ExpressionTestDiscoverer {
 
-  static void generate(URI root, TestDescriptor parentDescriptor) {
+  static void discover(URI root, TestDescriptor parent) {
     var classes = ReflectionSupport.findAllClassesInClasspathRoot(
             root,
-            ExpressionTestDescriptorFactory::hasExpressionAnnotations,
+            ExpressionTestDiscoverer::hasExpressionAnnotations,
             className -> true
     );
 
-    classes.forEach(clazz -> generate(clazz, parentDescriptor));
+    classes.forEach(clazz -> discover(clazz, parent));
   }
 
-  static void generate(Class<?> clazz, TestDescriptor parentDescriptor) {
-    if (clazz.isAnnotationPresent(Expressions.class)) {
-      generateForExpressionAnnotation(clazz, parentDescriptor);
+  static void discover(Class<?> clazz, TestDescriptor parent) {
+    var hasExpressions = clazz.isAnnotationPresent(Expressions.class);
+    var isExpressionsResource = clazz.isAnnotationPresent(ExpressionsResource.class);
+
+    if (!hasExpressions && !isExpressionsResource) {
+      return;
     }
 
-    if (clazz.isAnnotationPresent(ExpressionsResource.class)) {
+    var classTestDescriptor = new ClassBasedExpressionsTestDescriptor(parent, clazz);
+    parent.addChild(classTestDescriptor);
+
+    if (hasExpressions) {
+      generateForExpressionAnnotation(clazz, classTestDescriptor);
+    }
+
+    if (isExpressionsResource) {
       generateForExpressionResourceAnnotation(
               clazz,
               clazz.getAnnotation(ExpressionsResource.class).file(),
-              parentDescriptor);
+              classTestDescriptor);
     }
   }
 
@@ -49,23 +59,23 @@ class ExpressionTestDescriptorFactory {
   }
 
   static class ExpressionsAnnotatedClassGenerator {
-    static void generateForExpressionAnnotation(Class<?> clazz, TestDescriptor parentDescriptor) {
+    static void generateForExpressionAnnotation(Class<?> clazz, TestDescriptor parent) {
       var fields = ReflectionSupport.findFields(
               clazz,
               field -> field.isAnnotationPresent(Expression.class) && isStatic(field.getModifiers()) && field.getType() == String.class,
               TOP_DOWN
       );
 
-      fields.forEach(field -> generate(clazz, field, parentDescriptor));
+      fields.forEach(field -> generate(clazz, field, parent));
     }
 
-    private static void generate(Class<?> clazz, Field field, TestDescriptor parentDescriptor) {
+    private static void generate(Class<?> clazz, Field field, TestDescriptor parent) {
       var expression = getStringValueOf(field, clazz);
       var annotation = field.getAnnotation(Expression.class);
       var expected = annotation.expected();
-      var descriptor = new ExpressionTestDescriptor(expression, expected);
+      var descriptor = new ExpressionTestDescriptor(parent, expression, expected);
 
-      parentDescriptor.addChild(descriptor);
+      parent.addChild(descriptor);
     }
 
     private static String getStringValueOf(Field field, Class<?> clazz) {
@@ -79,15 +89,15 @@ class ExpressionTestDescriptorFactory {
 
   static class ExpressionResourceAnnotatedClassGenerator {
 
-    static void generateForExpressionResourceAnnotation(Class<?> clazz, String resourceFile, TestDescriptor parentDescriptor) {
+    static void generateForExpressionResourceAnnotation(Class<?> clazz, String resourceFile, TestDescriptor parent) {
       try (var is = clazz.getClassLoader().getResourceAsStream(resourceFile)) {
         if (is == null) {
           throw resourceFileAccessException(resourceFile);
         }
 
         new BufferedReader(new InputStreamReader(is)).lines().forEach(expression -> {
-          var descriptor = new ExpressionTestDescriptor(expression, "");
-          parentDescriptor.addChild(descriptor);
+          var descriptor = new ExpressionTestDescriptor(parent, expression);
+          parent.addChild(descriptor);
         });
       } catch (IOException exc) {
         throw resourceFileAccessException(resourceFile);

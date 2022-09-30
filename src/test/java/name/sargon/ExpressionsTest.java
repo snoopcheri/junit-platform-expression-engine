@@ -12,7 +12,7 @@ public class ExpressionsTest {
   @Expression
   static final String EXPR_2 = "20 + 3";
 
-  @Expression(expected = "43")
+  @Expression(expected = "42")
   static final String EXPR_3 = "2 * 3 * 7";
 
 }

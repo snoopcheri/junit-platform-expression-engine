@@ -1,6 +1,5 @@
 package name.sargon;
 
-import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -20,7 +19,22 @@ public class ExpressionTestExecutor {
     this.executionListener = executionListener;
   }
 
-  void execute(ExpressionTestDescriptor descriptor) {
+  void execute(ClassBasedExpressionsTestDescriptor classBasedDescriptor) {
+    try {
+      executionListener.executionStarted(classBasedDescriptor);
+
+      classBasedDescriptor.getChildren().stream()
+              .filter(descriptor -> descriptor instanceof ExpressionTestDescriptor)
+              .map(ExpressionTestDescriptor.class::cast)
+              .forEachOrdered(this::execute);
+
+      executionListener.executionFinished(classBasedDescriptor, successful());
+    } catch (Throwable failure) {
+      executionListener.executionFinished(classBasedDescriptor, failed(failure));
+    }
+  }
+
+  private void execute(ExpressionTestDescriptor descriptor) {
     try {
       executionListener.executionStarted(descriptor);
 

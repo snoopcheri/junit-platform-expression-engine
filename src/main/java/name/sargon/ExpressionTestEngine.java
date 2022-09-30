@@ -5,7 +5,6 @@ import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
-import static name.sargon.ExpressionTestDescriptorFactory.generate;
 import static org.junit.platform.engine.TestExecutionResult.failed;
 import static org.junit.platform.engine.TestExecutionResult.successful;
 
@@ -23,10 +22,10 @@ public class ExpressionTestEngine implements TestEngine {
     var engineDescriptor = new EngineDescriptor(uniqueId, "Expression Test Engine");
 
     request.getSelectorsByType(ClasspathRootSelector.class)
-            .forEach(selector -> generate(selector.getClasspathRoot(), engineDescriptor));
+            .forEach(selector -> ExpressionTestDiscoverer.discover(selector.getClasspathRoot(), engineDescriptor));
 
     request.getSelectorsByType(ClassSelector.class)
-            .forEach(selector -> generate(selector.getJavaClass(), engineDescriptor));
+            .forEach(selector -> ExpressionTestDiscoverer.discover(selector.getJavaClass(), engineDescriptor));
 
     return engineDescriptor;
   }
@@ -41,9 +40,9 @@ public class ExpressionTestEngine implements TestEngine {
       executionListener.executionStarted(root);
 
       root.getChildren().stream()
-              .filter(descriptor -> descriptor instanceof ExpressionTestDescriptor)
-              .map(ExpressionTestDescriptor.class::cast)
-              .forEach(expressionTestExecutor::execute);
+              .filter(descriptor -> descriptor instanceof ClassBasedExpressionsTestDescriptor)
+              .map(ClassBasedExpressionsTestDescriptor.class::cast)
+              .forEachOrdered(expressionTestExecutor::execute);
 
       executionListener.executionFinished(root, successful());
     } catch (Throwable failure) {
