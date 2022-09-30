@@ -24,10 +24,8 @@ public class ExpressionTestEngineTest {
             event(container(ExpressionsTest.class), started()),
             event(test("expression:6 * 7"), started()),
             event(test("expression:6 * 7"), finishedSuccessfully()),
-            event(test("expression:20 + 3"), started()),
-            event(test("expression:20 + 3"), finishedSuccessfully()),
             event(test("expression:2 * 3 * 7"), started()),
-            event(test("expression:2 * 3 * 7"), finishedSuccessfully()),
+            event(test("expression:2 * 3 * 7"), finishedWithFailure()),
             event(container(ExpressionsTest.class), finishedSuccessfully()),
             event(engine(), finishedSuccessfully())
     );
