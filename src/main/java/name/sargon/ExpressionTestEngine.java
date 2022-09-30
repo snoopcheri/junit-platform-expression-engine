@@ -1,13 +1,9 @@
 package name.sargon;
 
-import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
 import org.junit.platform.engine.*;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-
-import static org.junit.platform.engine.TestExecutionResult.failed;
-import static org.junit.platform.engine.TestExecutionResult.successful;
 
 public class ExpressionTestEngine implements TestEngine {
 
@@ -34,20 +30,12 @@ public class ExpressionTestEngine implements TestEngine {
   @Override
   public void execute(ExecutionRequest request) {
     var root = request.getRootTestDescriptor();
-    var executionListener = request.getEngineExecutionListener();
-    var expressionTestExecutor = new ExpressionTestExecutor( executionListener);
 
-    try {
-      executionListener.executionStarted(root);
+    if (root instanceof EngineDescriptor engineDescriptor) {
+      var executionListener = request.getEngineExecutionListener();
+      var executor = new ExpressionTestExecutor(executionListener);
 
-      root.getChildren().stream()
-              .filter(descriptor -> descriptor instanceof ClassBasedExpressionsTestDescriptor)
-              .map(ClassBasedExpressionsTestDescriptor.class::cast)
-              .forEachOrdered(expressionTestExecutor::execute);
-
-      executionListener.executionFinished(root, successful());
-    } catch (Throwable failure) {
-      executionListener.executionFinished(root, failed(failure));
+      executor.execute(engineDescriptor);
     }
   }
 

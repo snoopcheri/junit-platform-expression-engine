@@ -4,6 +4,7 @@ import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
 import name.sargon.descriptors.ExpressionTestDescriptor;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.junit.platform.engine.EngineExecutionListener;
+import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 import org.opentest4j.AssertionFailedError;
 
 import static java.lang.String.format;
@@ -18,7 +19,22 @@ public class ExpressionTestExecutor {
     this.executionListener = executionListener;
   }
 
-  void execute(ClassBasedExpressionsTestDescriptor classBasedDescriptor) {
+  void execute(EngineDescriptor root) {
+    try {
+      executionListener.executionStarted(root);
+
+      root.getChildren().stream()
+              .filter(descriptor -> descriptor instanceof ClassBasedExpressionsTestDescriptor)
+              .map(ClassBasedExpressionsTestDescriptor.class::cast)
+              .forEachOrdered(this::execute);
+
+      executionListener.executionFinished(root, successful());
+    } catch (Throwable failure) {
+      executionListener.executionFinished(root, failed(failure));
+    }
+  }
+
+  private void execute(ClassBasedExpressionsTestDescriptor classBasedDescriptor) {
     try {
       executionListener.executionStarted(classBasedDescriptor);
 
