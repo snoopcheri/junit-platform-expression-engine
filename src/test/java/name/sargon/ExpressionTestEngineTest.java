@@ -1,0 +1,52 @@
+package name.sargon;
+
+import org.junit.jupiter.api.Test;
+import org.junit.platform.testkit.engine.EngineTestKit;
+
+import static name.sargon.ExpressionTestEngine.EXPRESSION_TEST_ENGINE_ID;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
+import static org.junit.platform.testkit.engine.EventConditions.*;
+
+public class ExpressionTestEngineTest {
+
+  @Test
+  void testExpressions() {
+    // act
+    var events = EngineTestKit.engine(EXPRESSION_TEST_ENGINE_ID)
+            .selectors(selectClass(ExpressionsTest.class))
+            .execute()
+            .allEvents()
+            .debug();
+
+    // assert
+    events.assertEventsMatchExactly(
+            event(engine(), started()),
+            event(test("expression:6 * 7"), started()),
+            event(test("expression:6 * 7"), finishedSuccessfully()),
+            event(test("expression:20 + 3"), started()),
+            event(test("expression:20 + 3"), finishedSuccessfully()),
+            event(test("expression:2 * 3 * 7"), started()),
+            event(test("expression:2 * 3 * 7"), finishedWithFailure()),
+            event(engine(), finishedSuccessfully())
+    );
+  }
+
+  @Test
+  void testExpressionsResource() {
+    // act
+    var events = EngineTestKit.engine(EXPRESSION_TEST_ENGINE_ID)
+            .selectors(selectClass(ExpressionsResourceTest.class))
+            .execute()
+            .allEvents()
+            .debug();
+
+    // assert
+    events.assertEventsMatchLooselyInOrder(
+            event(engine(), started()),
+            event(test("1+2+3+4+5+6+7+8"), started()),
+            event(test("1+2+3+4+5+6+7+8"), finishedSuccessfully()),
+            event(engine(), finishedSuccessfully())
+    );
+  }
+
+}
