@@ -21,12 +21,14 @@ public class ExpressionTestEngineTest {
     // assert
     events.assertEventsMatchExactly(
             event(engine(), started()),
+            event(container(ExpressionsTest.class), started()),
             event(test("expression:6 * 7"), started()),
             event(test("expression:6 * 7"), finishedSuccessfully()),
             event(test("expression:20 + 3"), started()),
             event(test("expression:20 + 3"), finishedSuccessfully()),
             event(test("expression:2 * 3 * 7"), started()),
-            event(test("expression:2 * 3 * 7"), finishedWithFailure()),
+            event(test("expression:2 * 3 * 7"), finishedSuccessfully()),
+            event(container(ExpressionsTest.class), finishedSuccessfully()),
             event(engine(), finishedSuccessfully())
     );
   }
@@ -43,8 +45,10 @@ public class ExpressionTestEngineTest {
     // assert
     events.assertEventsMatchLooselyInOrder(
             event(engine(), started()),
+            event(container(ExpressionsResourceTest.class), started()),
             event(test("1+2+3+4+5+6+7+8"), started()),
             event(test("1+2+3+4+5+6+7+8"), finishedSuccessfully()),
+            event(container(ExpressionsResourceTest.class), finishedSuccessfully()),
             event(engine(), finishedSuccessfully())
     );
   }
