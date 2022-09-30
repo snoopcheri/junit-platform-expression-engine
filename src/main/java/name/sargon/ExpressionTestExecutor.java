@@ -1,8 +1,9 @@
 package name.sargon;
 
+import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
+import name.sargon.descriptors.ExpressionTestDescriptor;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.junit.platform.engine.EngineExecutionListener;
-import org.junit.platform.engine.TestDescriptor;
 import org.opentest4j.AssertionFailedError;
 
 import static java.lang.String.format;
@@ -11,11 +12,9 @@ import static org.junit.platform.engine.TestExecutionResult.successful;
 
 public class ExpressionTestExecutor {
 
-  private final TestDescriptor root;
   private final EngineExecutionListener executionListener;
 
-  public ExpressionTestExecutor(TestDescriptor root, EngineExecutionListener executionListener) {
-    this.root = root;
+  public ExpressionTestExecutor(EngineExecutionListener executionListener) {
     this.executionListener = executionListener;
   }
 

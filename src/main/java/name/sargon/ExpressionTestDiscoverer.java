@@ -3,6 +3,8 @@ package name.sargon;
 import name.sargon.ExpressionAnnotations.Expression;
 import name.sargon.ExpressionAnnotations.Expressions;
 import name.sargon.ExpressionAnnotations.ExpressionsResource;
+import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
+import name.sargon.descriptors.ExpressionTestDescriptor;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.TestDescriptor;
 

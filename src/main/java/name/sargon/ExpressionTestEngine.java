@@ -1,5 +1,6 @@
 package name.sargon;
 
+import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
 import org.junit.platform.engine.*;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
@@ -34,7 +35,7 @@ public class ExpressionTestEngine implements TestEngine {
   public void execute(ExecutionRequest request) {
     var root = request.getRootTestDescriptor();
     var executionListener = request.getEngineExecutionListener();
-    var expressionTestExecutor = new ExpressionTestExecutor(root, executionListener);
+    var expressionTestExecutor = new ExpressionTestExecutor( executionListener);
 
     try {
       executionListener.executionStarted(root);

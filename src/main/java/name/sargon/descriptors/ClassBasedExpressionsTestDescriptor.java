@@ -1,4 +1,4 @@
-package name.sargon;
+package name.sargon.descriptors;
 
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -9,11 +9,8 @@ import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER;
 
 public class ClassBasedExpressionsTestDescriptor extends AbstractTestDescriptor {
 
-  private final Class<?> clazz;
-
   public ClassBasedExpressionsTestDescriptor(TestDescriptor parent, Class<?> clazz) {
     super(uniqueIdFor(parent, clazz), displayNameFor(clazz), ClassSource.from(clazz));
-    this.clazz = clazz;
   }
 
   @Override

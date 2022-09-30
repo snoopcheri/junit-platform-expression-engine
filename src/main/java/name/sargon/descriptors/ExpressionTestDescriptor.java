@@ -1,4 +1,4 @@
-package name.sargon;
+package name.sargon.descriptors;
 
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
@@ -6,17 +6,17 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import static org.junit.platform.engine.TestDescriptor.Type.TEST;
 
-class ExpressionTestDescriptor extends AbstractTestDescriptor {
+public class ExpressionTestDescriptor extends AbstractTestDescriptor {
 
   private final String expression;
 
   private final String expected;
 
-  ExpressionTestDescriptor(TestDescriptor parent, String expression) {
+  public ExpressionTestDescriptor(TestDescriptor parent, String expression) {
     this(parent, expression, "");
   }
 
-  ExpressionTestDescriptor(TestDescriptor parent, String expression, String expected) {
+  public ExpressionTestDescriptor(TestDescriptor parent, String expression, String expected) {
     super(uniqueIdFor(parent, expression, expected), displayNameFor(expression, expected));
 
     this.expression = expression;
@@ -28,11 +28,11 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
     return TEST;
   }
 
-  String getExpression() {
+  public String getExpression() {
     return expression;
   }
 
-  String getExpected() {
+  public String getExpected() {
     return expected;
   }
 
