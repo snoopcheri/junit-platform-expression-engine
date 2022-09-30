@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("org.gradle.test-retry").version("1.4.1")
 }
 
 group = "name.sargon"
@@ -23,5 +24,11 @@ dependencies {
 }
 
 tasks.getByName<Test>("test") {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeEngines("expression-test-engine", "junit-jupiter")
+    }
+
+    retry {
+        maxRetries.set(1)
+    }
 }
