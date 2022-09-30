@@ -4,7 +4,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER_AND_TEST;
+import static org.junit.platform.engine.TestDescriptor.Type.TEST;
 
 class ExpressionTestDescriptor extends AbstractTestDescriptor {
 
@@ -25,7 +25,7 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
 
   @Override
   public Type getType() {
-    return CONTAINER_AND_TEST;
+    return TEST;
   }
 
   String getExpression() {
