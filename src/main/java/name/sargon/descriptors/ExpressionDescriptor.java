@@ -6,17 +6,17 @@ import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import static org.junit.platform.engine.TestDescriptor.Type.TEST;
 
-public class ExpressionTestDescriptor extends AbstractTestDescriptor {
+public class ExpressionDescriptor extends AbstractTestDescriptor {
 
   private final String expression;
 
   private final String expected;
 
-  public ExpressionTestDescriptor(TestDescriptor parent, String expression) {
+  public ExpressionDescriptor(TestDescriptor parent, String expression) {
     this(parent, expression, "");
   }
 
-  public ExpressionTestDescriptor(TestDescriptor parent, String expression, String expected) {
+  public ExpressionDescriptor(TestDescriptor parent, String expression, String expected) {
     super(uniqueIdFor(parent, expression, expected), displayNameFor(expression, expected));
 
     this.expression = expression;

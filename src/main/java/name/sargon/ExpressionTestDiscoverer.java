@@ -3,8 +3,8 @@ package name.sargon;
 import name.sargon.ExpressionAnnotations.Expression;
 import name.sargon.ExpressionAnnotations.Expressions;
 import name.sargon.ExpressionAnnotations.ExpressionsResource;
-import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
-import name.sargon.descriptors.ExpressionTestDescriptor;
+import name.sargon.descriptors.ClassBasedExpressionDescriptor;
+import name.sargon.descriptors.ExpressionDescriptor;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.TestDescriptor;
 
@@ -40,7 +40,7 @@ class ExpressionTestDiscoverer {
       return;
     }
 
-    var classTestDescriptor = new ClassBasedExpressionsTestDescriptor(parent, clazz);
+    var classTestDescriptor = new ClassBasedExpressionDescriptor(parent, clazz);
     parent.addChild(classTestDescriptor);
 
     if (hasExpressions) {
@@ -75,7 +75,7 @@ class ExpressionTestDiscoverer {
       var expression = getStringValueOf(field, clazz);
       var annotation = field.getAnnotation(Expression.class);
       var expected = annotation.expected();
-      var descriptor = new ExpressionTestDescriptor(parent, expression, expected);
+      var descriptor = new ExpressionDescriptor(parent, expression, expected);
 
       parent.addChild(descriptor);
     }
@@ -98,7 +98,7 @@ class ExpressionTestDiscoverer {
         }
 
         new BufferedReader(new InputStreamReader(is)).lines().forEach(expression -> {
-          var descriptor = new ExpressionTestDescriptor(parent, expression);
+          var descriptor = new ExpressionDescriptor(parent, expression);
           parent.addChild(descriptor);
         });
       } catch (IOException exc) {

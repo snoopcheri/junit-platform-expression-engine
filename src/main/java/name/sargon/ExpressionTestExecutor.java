@@ -1,7 +1,7 @@
 package name.sargon;
 
-import name.sargon.descriptors.ClassBasedExpressionsTestDescriptor;
-import name.sargon.descriptors.ExpressionTestDescriptor;
+import name.sargon.descriptors.ClassBasedExpressionDescriptor;
+import name.sargon.descriptors.ExpressionDescriptor;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
@@ -24,8 +24,8 @@ public class ExpressionTestExecutor {
       executionListener.executionStarted(root);
 
       root.getChildren().stream()
-              .filter(descriptor -> descriptor instanceof ClassBasedExpressionsTestDescriptor)
-              .map(ClassBasedExpressionsTestDescriptor.class::cast)
+              .filter(descriptor -> descriptor instanceof ClassBasedExpressionDescriptor)
+              .map(ClassBasedExpressionDescriptor.class::cast)
               .forEachOrdered(this::execute);
 
       executionListener.executionFinished(root, successful());
@@ -34,13 +34,13 @@ public class ExpressionTestExecutor {
     }
   }
 
-  private void execute(ClassBasedExpressionsTestDescriptor classBasedDescriptor) {
+  private void execute(ClassBasedExpressionDescriptor classBasedDescriptor) {
     try {
       executionListener.executionStarted(classBasedDescriptor);
 
       classBasedDescriptor.getChildren().stream()
-              .filter(descriptor -> descriptor instanceof ExpressionTestDescriptor)
-              .map(ExpressionTestDescriptor.class::cast)
+              .filter(descriptor -> descriptor instanceof ExpressionDescriptor)
+              .map(ExpressionDescriptor.class::cast)
               .forEachOrdered(this::execute);
 
       executionListener.executionFinished(classBasedDescriptor, successful());
@@ -49,7 +49,7 @@ public class ExpressionTestExecutor {
     }
   }
 
-  private void execute(ExpressionTestDescriptor descriptor) {
+  private void execute(ExpressionDescriptor descriptor) {
     try {
       executionListener.executionStarted(descriptor);
 
