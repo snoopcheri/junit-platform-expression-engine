@@ -3,8 +3,6 @@ package name.sargon;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-import javax.annotation.Nullable;
-
 import static name.sargon.ExpressionTestEngine.EXPRESSION_TEST_ENGINE_ID;
 import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER_AND_TEST;
 
@@ -15,11 +13,7 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
   private final String expected;
 
   ExpressionTestDescriptor(String expression, String expected) {
-    this(expression, expected, null);
-  }
-
-  ExpressionTestDescriptor(String expression, String expected, @Nullable Integer xValue) {
-    super(uniqueIdFor(expression, expected, xValue), displayNameFor(expression, expected, xValue));
+    super(uniqueIdFor(expression, expected), displayNameFor(expression, expected));
 
     this.expression = expression;
     this.expected = expected;
@@ -38,7 +32,7 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
     return expected;
   }
 
-  private static UniqueId uniqueIdFor(String expression, String expected, @Nullable Integer xValue) {
+  private static UniqueId uniqueIdFor(String expression, String expected) {
     var uniqueId = UniqueId.forEngine(EXPRESSION_TEST_ENGINE_ID)
             .append("expression", expression);
 
@@ -46,22 +40,14 @@ class ExpressionTestDescriptor extends AbstractTestDescriptor {
       uniqueId = uniqueId.append("expected", expected);
     }
 
-    if (xValue != null) {
-      uniqueId = uniqueId.append("xValue", String.valueOf(xValue));
-    }
-
     return uniqueId;
   }
 
-  private static String displayNameFor(String expression, String expected, @Nullable Integer xValue) {
+  private static String displayNameFor(String expression, String expected) {
     var str = new StringBuilder(expression);
 
     if (!expected.isBlank()) {
       str.append(" = ").append(expected);
-    }
-
-    if (xValue != null) {
-      str.append(" [for x=").append(xValue).append("]");
     }
 
     return str.toString();
