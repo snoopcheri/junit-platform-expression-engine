@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import static name.sargon.ExpressionTestEngine.EXPRESSION_TEST_ENGINE_ID;
 import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER_AND_TEST;
-import static org.junit.platform.engine.TestDescriptor.Type.TEST;
 
 class ExpressionTestDescriptor extends AbstractTestDescriptor {
 
