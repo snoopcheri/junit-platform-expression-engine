@@ -33,24 +33,4 @@ public class ExpressionTestEngineTest {
     );
   }
 
-  @Test
-  void testExpressionsResource() {
-    // act
-    var events = EngineTestKit.engine(EXPRESSION_TEST_ENGINE_ID)
-            .selectors(selectClass(ExpressionsResourceTest.class))
-            .execute()
-            .allEvents()
-            .debug();
-
-    // assert
-    events.assertEventsMatchLooselyInOrder(
-            event(engine(), started()),
-            event(container(ExpressionsResourceTest.class), started()),
-            event(test("1+2+3+4+5+6+7+8"), started()),
-            event(test("1+2+3+4+5+6+7+8"), finishedSuccessfully()),
-            event(container(ExpressionsResourceTest.class), finishedSuccessfully()),
-            event(engine(), finishedSuccessfully())
-    );
-  }
-
 }

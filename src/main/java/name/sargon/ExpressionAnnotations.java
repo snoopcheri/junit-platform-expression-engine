@@ -14,13 +14,6 @@ public class ExpressionAnnotations {
   @Target(TYPE)
   @Retention(RUNTIME)
   @Testable
-  @interface ExpressionsResource {
-    String file();
-  }
-
-  @Target(TYPE)
-  @Retention(RUNTIME)
-  @Testable
   @interface Expressions {
   }
 
@@ -36,6 +29,7 @@ public class ExpressionAnnotations {
   @Testable
   @interface VariableExpression {
     String from() default "0";
+
     String to() default "0";
   }
 
