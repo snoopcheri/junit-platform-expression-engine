@@ -3,6 +3,7 @@ package name.sargon;
 import org.junit.platform.engine.*;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.ClasspathRootSelector;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
 
 public class ExpressionTestEngine implements TestEngine {
@@ -24,6 +25,9 @@ public class ExpressionTestEngine implements TestEngine {
     request.getSelectorsByType(ClassSelector.class)
             .forEach(selector -> ExpressionTestDiscoverer.discover(selector.getJavaClass(), engineDescriptor));
 
+    request.getSelectorsByType(UniqueIdSelector.class)
+            .forEach(selector -> ExpressionTestDiscoverer.discover(selector.getUniqueId(), engineDescriptor));
+
     return engineDescriptor;
   }
 
@@ -37,6 +41,10 @@ public class ExpressionTestEngine implements TestEngine {
 
       executor.execute(engineDescriptor);
     }
+  }
+
+  static boolean isCompatibleWithEngine(UniqueId uniqueId) {
+    return EXPRESSION_TEST_ENGINE_ID.equals(uniqueId.getEngineId().orElse("unknown"));
   }
 
 }

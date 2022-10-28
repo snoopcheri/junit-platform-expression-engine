@@ -9,6 +9,8 @@ import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER;
 
 public class ClassBasedExpressionDescriptor extends AbstractTestDescriptor {
 
+  public static final String CLASS_SEGMENT_NAME = "class";
+
   public ClassBasedExpressionDescriptor(TestDescriptor parent, Class<?> clazz) {
     super(uniqueIdFor(parent, clazz), displayNameFor(clazz), ClassSource.from(clazz));
   }
@@ -19,7 +21,7 @@ public class ClassBasedExpressionDescriptor extends AbstractTestDescriptor {
   }
 
   private static UniqueId uniqueIdFor(TestDescriptor parent, Class<?> clazz) {
-    return parent.getUniqueId().append("class", clazz.getName());
+    return parent.getUniqueId().append(CLASS_SEGMENT_NAME, clazz.getName());
   }
 
   private static String displayNameFor(Class<?> clazz) {

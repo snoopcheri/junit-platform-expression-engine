@@ -9,6 +9,10 @@ import name.sargon.descriptors.ConstantExpressionDescriptor;
 import name.sargon.descriptors.VariableExpressionDescriptor;
 import org.junit.platform.commons.support.ReflectionSupport;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.discovery.ClassSelector;
+import org.junit.platform.engine.discovery.ClasspathRootSelector;
+import org.junit.platform.engine.discovery.UniqueIdSelector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,10 +24,16 @@ import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isStatic;
 import static name.sargon.ExpressionTestDiscoverer.ExpressionResourceAnnotatedClassGenerator.generateForExpressionResourceAnnotation;
 import static name.sargon.ExpressionTestDiscoverer.ExpressionsAnnotatedClassGenerator.generateForExpressionAnnotation;
+import static name.sargon.ExpressionTestEngine.isCompatibleWithEngine;
+import static name.sargon.descriptors.ClassBasedExpressionDescriptor.CLASS_SEGMENT_NAME;
 import static org.junit.platform.commons.support.HierarchyTraversalMode.TOP_DOWN;
+import static org.junit.platform.commons.support.ReflectionSupport.tryToLoadClass;
 
 class ExpressionTestDiscoverer {
 
+  /**
+   * Discovers tests for {@link ClasspathRootSelector}.
+   */
   static void discover(URI root, TestDescriptor parent) {
     var classes = ReflectionSupport.findAllClassesInClasspathRoot(
             root,
@@ -34,6 +44,9 @@ class ExpressionTestDiscoverer {
     classes.forEach(clazz -> discover(clazz, parent));
   }
 
+  /**
+   * Discovers tests for {@link ClassSelector}.
+   */
   static void discover(Class<?> clazz, TestDescriptor parent) {
     var hasExpressions = clazz.isAnnotationPresent(Expressions.class);
     var isExpressionsResource = clazz.isAnnotationPresent(ExpressionsResource.class);
@@ -55,6 +68,30 @@ class ExpressionTestDiscoverer {
               clazz.getAnnotation(ExpressionsResource.class).file(),
               classTestDescriptor);
     }
+  }
+
+
+  /**
+   * Discovers tests for {@link UniqueIdSelector}.
+   */
+  static void discover(UniqueId uniqueId, TestDescriptor parent) {
+    if (!isCompatibleWithEngine(uniqueId)) {
+      return;
+    }
+
+    // Since Test Distribution only distributes direct children of the engine level,
+    // it is enough to consider the class level. When more specific unique IDs are
+    // specified, the expression engine simply runs executes everything below the
+    // class level.
+
+    uniqueId.getSegments().stream()
+            .filter(segment -> CLASS_SEGMENT_NAME.equals(segment.getType()))
+            .findFirst()
+            .ifPresent(segment -> {
+              var fullyQualifiedClassName = segment.getValue();
+              tryToLoadClass(fullyQualifiedClassName)
+                      .ifSuccess(clazz -> discover(clazz, parent));
+            });
   }
 
   private static boolean hasExpressionAnnotations(Class<?> clazz) {
@@ -100,7 +137,7 @@ class ExpressionTestDiscoverer {
       parent.addChild(descriptor);
     }
 
-      private static String getStringValueOf(Field field, Class<?> clazz) {
+    private static String getStringValueOf(Field field, Class<?> clazz) {
       try {
         return field.get(clazz).toString();
       } catch (IllegalAccessException e) {
