@@ -39,7 +39,10 @@ public class VariableExpressionDescriptor extends AbstractTestDescriptor {
   }
 
   private static UniqueId uniqueIdFor(TestDescriptor parent, String expression, String from, String to) {
-    return parent.getUniqueId().append("var-expression", expression);
+    return parent.getUniqueId()
+            .append("var-expression", expression)
+            .append("from", from)
+            .append("to", to);
   }
 
   static String displayNameFor(String expression, String from, String to) {
