@@ -23,6 +23,12 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 tasks.getByName<Test>("test") {
     useJUnitPlatform {
         includeEngines("expression-test-engine", "junit-jupiter")
