@@ -6,10 +6,8 @@ import name.sargon.descriptors.VariableExpressionDescriptor;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.support.descriptor.EngineDescriptor;
-import org.opentest4j.AssertionFailedError;
 
 import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static org.junit.platform.engine.TestExecutionResult.failed;
 import static org.junit.platform.engine.TestExecutionResult.successful;
@@ -62,10 +60,9 @@ public class ExpressionTestExecutor {
       executionListener.executionStarted(descriptor);
 
       var expression = descriptor.getConstExpression();
-      var expected = descriptor.getExpected();
-      var actual = (int) new ExpressionBuilder(expression).build().evaluate();
+      var evaluatedValue = (int) new ExpressionBuilder(expression).build().evaluate();
 
-      showAndVerify(expression, expected, actual);
+      System.out.printf("-> %s = %d%n", expression, evaluatedValue);
 
       executionListener.executionFinished(descriptor, successful());
 
@@ -95,24 +92,6 @@ public class ExpressionTestExecutor {
     } catch (Throwable failure) {
       executionListener.executionFinished(descriptor, failed(failure));
     }
-  }
-
-  private static void showAndVerify(String expression, String expected, int actual) {
-    if (expected.isBlank()) {
-      showResult(expression, actual, "");
-    } else {
-      var value = parseInt(expected);
-      if (value == actual) {
-        showResult(expression, actual, " ✓");
-      } else {
-        showResult(expression, actual, format(" ❌ (expected: %d)", value));
-        throw new AssertionFailedError(format("expected: %s, but was: %d", expected, actual));
-      }
-    }
-  }
-
-  private static void showResult(String expression, int actual, String verificationText) {
-    System.out.printf("-> %s = %d%s%n", expression, actual, verificationText);
   }
 
 }

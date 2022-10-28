@@ -10,17 +10,10 @@ public class ConstantExpressionDescriptor extends AbstractTestDescriptor {
 
   private final String constExpression;
 
-  private final String expected;
-
   public ConstantExpressionDescriptor(TestDescriptor parent, String constExpression) {
-    this(parent, constExpression, "");
-  }
-
-  public ConstantExpressionDescriptor(TestDescriptor parent, String constExpression, String expected) {
-    super(uniqueIdFor(parent, constExpression, expected), displayNameFor(constExpression, expected));
+    super(uniqueIdFor(parent, constExpression), displayNameFor(constExpression));
 
     this.constExpression = constExpression;
-    this.expected = expected;
   }
 
   @Override
@@ -32,28 +25,13 @@ public class ConstantExpressionDescriptor extends AbstractTestDescriptor {
     return constExpression;
   }
 
-  public String getExpected() {
-    return expected;
+  private static UniqueId uniqueIdFor(TestDescriptor parent, String expression) {
+    return parent.getUniqueId()
+            .append("const-expression", expression);
   }
 
-  private static UniqueId uniqueIdFor(TestDescriptor parent, String expression, String expected) {
-    var uniqueId = parent.getUniqueId().append("const-expression", expression);
-
-    if (!expected.isBlank()) {
-      uniqueId = uniqueId.append("expected", expected);
-    }
-
-    return uniqueId;
-  }
-
-  private static String displayNameFor(String expression, String expected) {
-    var str = new StringBuilder(expression);
-
-    if (!expected.isBlank()) {
-      str.append(" = ").append(expected);
-    }
-
-    return str.toString();
+  private static String displayNameFor(String expression) {
+    return expression;
   }
 
 }

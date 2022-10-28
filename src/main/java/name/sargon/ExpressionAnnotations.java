@@ -21,7 +21,6 @@ public class ExpressionAnnotations {
   @Retention(RUNTIME)
   @Testable
   @interface ConstantExpression {
-    String expected() default "";
   }
 
   @Target(FIELD)

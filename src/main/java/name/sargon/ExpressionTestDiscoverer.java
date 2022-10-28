@@ -96,9 +96,7 @@ class ExpressionTestDiscoverer {
 
     private static void addConstantExpression(Class<?> clazz, Field field, TestDescriptor parent) {
       var expression = getStringValueOf(field, clazz);
-      var annotation = field.getAnnotation(ConstantExpression.class);
-      var expected = annotation.expected();
-      var descriptor = new ConstantExpressionDescriptor(parent, expression, expected);
+      var descriptor = new ConstantExpressionDescriptor(parent, expression);
 
       parent.addChild(descriptor);
     }
