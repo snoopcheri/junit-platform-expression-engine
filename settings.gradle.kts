@@ -1,2 +1,2 @@
-rootProject.name = "junit5-expression-engine"
+rootProject.name = "junit-platform-expression-engine"
 
