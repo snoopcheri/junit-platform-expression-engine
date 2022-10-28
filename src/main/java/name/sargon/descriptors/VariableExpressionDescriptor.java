@@ -2,23 +2,19 @@ package name.sargon.descriptors;
 
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static org.junit.platform.engine.TestDescriptor.Type.CONTAINER_AND_TEST;
 
-public class VariableExpressionDescriptor extends AbstractTestDescriptor {
+public class VariableExpressionDescriptor extends ExpressionDescriptor {
 
-  private final String varExpression;
-  private final String from;
-  private final String to;
-
-  public VariableExpressionDescriptor(TestDescriptor parent, String varExpression, String from, String to) {
-    super(uniqueIdFor(parent, varExpression, from, to), displayNameFor(varExpression, from, to));
-
-    this.varExpression = varExpression;
-    this.from = from;
-    this.to = to;
+  public VariableExpressionDescriptor(TestDescriptor parent, long varExpressionIndex, String varExpression, String from, String to) {
+    super(
+            uniqueIdFor(parent, varExpressionIndex),
+            displayNameFor(varExpressionIndex, varExpression, from, to),
+            varExpressionIndex
+    );
   }
 
   @Override
@@ -26,27 +22,13 @@ public class VariableExpressionDescriptor extends AbstractTestDescriptor {
     return CONTAINER_AND_TEST;
   }
 
-  public String getVarExpression() {
-    return varExpression;
-  }
-
-  public String getFrom() {
-    return from;
-  }
-
-  public String getTo() {
-    return to;
-  }
-
-  private static UniqueId uniqueIdFor(TestDescriptor parent, String expression, String from, String to) {
+  private static UniqueId uniqueIdFor(TestDescriptor parent, long varExpressionIndex) {
     return parent.getUniqueId()
-            .append("var-expression", expression)
-            .append("from", from)
-            .append("to", to);
+            .append("var-expression-index", valueOf(varExpressionIndex));
   }
 
-  static String displayNameFor(String expression, String from, String to) {
-    return format("%s {from=%s, to=%s}", expression, from, to);
+  static String displayNameFor(long varExpressionIndex, String varExpression, String from, String to) {
+    return format("%d: %s {from=%s, to=%s}", varExpressionIndex, varExpression, from, to);
   }
 
 }

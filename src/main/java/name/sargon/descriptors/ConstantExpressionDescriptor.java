@@ -2,18 +2,19 @@ package name.sargon.descriptors;
 
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static org.junit.platform.engine.TestDescriptor.Type.TEST;
 
-public class ConstantExpressionDescriptor extends AbstractTestDescriptor {
+public class ConstantExpressionDescriptor extends ExpressionDescriptor {
 
-  private final String constExpression;
-
-  public ConstantExpressionDescriptor(TestDescriptor parent, String constExpression) {
-    super(uniqueIdFor(parent, constExpression), displayNameFor(constExpression));
-
-    this.constExpression = constExpression;
+  public ConstantExpressionDescriptor(TestDescriptor parent, long constExpressionIndex, String constExpression) {
+    super(
+            uniqueIdFor(parent, constExpressionIndex),
+            displayNameFor(constExpressionIndex, constExpression),
+            constExpressionIndex
+    );
   }
 
   @Override
@@ -21,17 +22,13 @@ public class ConstantExpressionDescriptor extends AbstractTestDescriptor {
     return TEST;
   }
 
-  public String getConstExpression() {
-    return constExpression;
-  }
-
-  private static UniqueId uniqueIdFor(TestDescriptor parent, String expression) {
+  private static UniqueId uniqueIdFor(TestDescriptor parent, long constExpressionIndex) {
     return parent.getUniqueId()
-            .append("const-expression", expression);
+            .append("const-expression-index", valueOf(constExpressionIndex));
   }
 
-  private static String displayNameFor(String expression) {
-    return expression;
+  private static String displayNameFor(long constExpressionIndex, String constExpression) {
+    return format("%d: %s", constExpressionIndex, constExpression);
   }
 
 }

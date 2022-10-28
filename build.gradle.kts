@@ -16,6 +16,7 @@ dependencies {
     implementation(platform("org.junit:junit-bom:5.9.0"))
     implementation("org.junit.platform:junit-platform-engine")
     implementation("net.objecthunter:exp4j:0.4.8")
+    implementation("com.codepoetics:protonpack:1.16")
 
     testImplementation("org.junit.platform:junit-platform-testkit")
     testImplementation("org.junit.jupiter:junit-jupiter-api")

@@ -22,12 +22,12 @@ public class ExpressionTestEngineTest {
     events.assertEventsMatchLooselyInOrder(
             event(engine(), started()),
             event(container(ExpressionsTest.class), started()),
-            event(test("const-expression:6 * 7"), started()),
-            event(test("const-expression:6 * 7"), finishedSuccessfully()),
-            event(test("const-expression:2 * 3 * 7"), started()),
-            event(test("const-expression:2 * 3 * 7"), finishedSuccessfully()),
-            event(test("var-expression:x * x"), started()),
-            event(test("var-expression:x * x"), finishedSuccessfully()),
+            event(test("const-expression-index:0"), started()),
+            event(test("const-expression-index:0"), finishedSuccessfully()),
+            event(test("const-expression-index:1"), started()),
+            event(test("const-expression-index:1"), finishedSuccessfully()),
+            event(test("var-expression-index:0"), started()),
+            event(test("var-expression-index:0"), finishedSuccessfully()),
             event(container(ExpressionsTest.class), finishedSuccessfully()),
             event(engine(), finishedSuccessfully())
     );

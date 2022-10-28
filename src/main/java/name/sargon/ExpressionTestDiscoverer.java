@@ -1,6 +1,6 @@
 package name.sargon;
 
-import name.sargon.ExpressionAnnotations.ConstantExpression;
+import com.codepoetics.protonpack.Indexed;
 import name.sargon.ExpressionAnnotations.Expressions;
 import name.sargon.ExpressionAnnotations.VariableExpression;
 import name.sargon.descriptors.ClassBasedExpressionDescriptor;
@@ -16,11 +16,11 @@ import org.junit.platform.engine.discovery.UniqueIdSelector;
 import java.lang.reflect.Field;
 import java.net.URI;
 
-import static java.lang.reflect.Modifier.isStatic;
+import static com.codepoetics.protonpack.StreamUtils.zipWithIndex;
 import static name.sargon.ExpressionTestDiscoverer.ExpressionsAnnotatedClassGenerator.generateForExpressionAnnotation;
 import static name.sargon.ExpressionTestEngine.isCompatibleWithEngine;
+import static name.sargon.FieldUtils.*;
 import static name.sargon.descriptors.ClassBasedExpressionDescriptor.CLASS_SEGMENT_NAME;
-import static org.junit.platform.commons.support.HierarchyTraversalMode.TOP_DOWN;
 import static org.junit.platform.commons.support.ReflectionSupport.tryToLoadClass;
 
 class ExpressionTestDiscoverer {
@@ -77,47 +77,30 @@ class ExpressionTestDiscoverer {
 
   static class ExpressionsAnnotatedClassGenerator {
     static void generateForExpressionAnnotation(Class<?> clazz, TestDescriptor parent) {
-      var constantExpressionFields = ReflectionSupport.findFields(
-              clazz,
-              field -> field.isAnnotationPresent(ConstantExpression.class) && isStatic(field.getModifiers()) && field.getType() == String.class,
-              TOP_DOWN
-      );
+      zipWithIndex(fieldsForConstantExpressions(clazz).stream())
+              .forEach(field -> addConstantExpression(clazz, field, parent));
 
-      constantExpressionFields.forEach(field -> addConstantExpression(clazz, field, parent));
-
-      var variableExpressionFields = ReflectionSupport.findFields(
-              clazz,
-              field -> field.isAnnotationPresent(VariableExpression.class) && isStatic(field.getModifiers()) && field.getType() == String.class,
-              TOP_DOWN
-      );
-
-      variableExpressionFields.forEach(field -> addVariableExpression(clazz, field, parent));
+      zipWithIndex(fieldsForVariableExpressions(clazz).stream())
+              .forEach(field -> addVariableExpression(clazz, field, parent));
     }
 
-    private static void addConstantExpression(Class<?> clazz, Field field, TestDescriptor parent) {
-      var expression = getStringValueOf(field, clazz);
-      var descriptor = new ConstantExpressionDescriptor(parent, expression);
+    private static void addConstantExpression(Class<?> clazz, Indexed<Field> field, TestDescriptor parent) {
+      var expression = stringValueOf(field.getValue(), clazz);
+      var descriptor = new ConstantExpressionDescriptor(parent, field.getIndex(), expression);
 
       parent.addChild(descriptor);
     }
 
-    private static void addVariableExpression(Class<?> clazz, Field field, TestDescriptor parent) {
-      var expression = getStringValueOf(field, clazz);
-      var annotation = field.getAnnotation(VariableExpression.class);
+    private static void addVariableExpression(Class<?> clazz, Indexed<Field> field, TestDescriptor parent) {
+      var expression = stringValueOf(field.getValue(), clazz);
+      var annotation = field.getValue().getAnnotation(VariableExpression.class);
       var from = annotation.from();
       var to = annotation.to();
-      var descriptor = new VariableExpressionDescriptor(parent, expression, from, to);
+      var descriptor = new VariableExpressionDescriptor(parent, field.getIndex(), expression, from, to);
 
       parent.addChild(descriptor);
     }
 
-    private static String getStringValueOf(Field field, Class<?> clazz) {
-      try {
-        return field.get(clazz).toString();
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 
 }
